@@ -12,18 +12,18 @@ from collections import defaultdict, deque
 from game import Board, Game
 from mcts_pure import MCTSPlayer as MCTS_Pure
 from mcts_alphaZero import MCTSPlayer
-from policy_value_net import PolicyValueNet  # Theano and Lasagne
+# from policy_value_net import PolicyValueNet  # Theano and Lasagne
 # from policy_value_net_pytorch import PolicyValueNet  # Pytorch
 # from policy_value_net_tensorflow import PolicyValueNet # Tensorflow
-# from policy_value_net_keras import PolicyValueNet # Keras
+from policy_value_net_keras import PolicyValueNet # Keras
 
 
 class TrainPipeline():
     def __init__(self, init_model=None):
         # params of the board and the game
-        self.board_width = 6
-        self.board_height = 6
-        self.n_in_row = 4
+        self.board_width = 19
+        self.board_height = 19
+        self.n_in_row = 5
         self.board = Board(width=self.board_width,
                            height=self.board_height,
                            n_in_row=self.n_in_row)
@@ -32,7 +32,7 @@ class TrainPipeline():
         self.learn_rate = 2e-3
         self.lr_multiplier = 1.0  # adaptively adjust the learning rate based on KL
         self.temp = 1.0  # the temperature param
-        self.n_playout = 400  # num of simulations for each move
+        self.n_playout = 1600  # num of simulations for each move
         self.c_puct = 5
         self.buffer_size = 10000
         self.batch_size = 512  # mini-batch size for training
@@ -86,7 +86,7 @@ class TrainPipeline():
         """collect self-play data for training"""
         for i in range(n_games):
             winner, play_data = self.game.start_self_play(self.mcts_player,
-                                                          temp=self.temp)
+                                                          temp=self.temp, is_shown=1)
             play_data = list(play_data)[:]
             self.episode_len = len(play_data)
             # augment the data
